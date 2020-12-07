@@ -60,6 +60,7 @@ export default observer(function TestComponent ({ style }) {
       Card.rest
         Span(bold) REST API call to '/api/test-thing' (updated each 3 sec):
         Span #{JSON.stringify(api)}
+      Button(onPress=()=>postPokemon({name:'testpokemon'})) ADD POKEMON
   `
 })
 
@@ -73,6 +74,11 @@ async function getApi () {
   } catch (err) {
     return err.message
   }
+}
+
+async function postPokemon(pokemonData){
+  let res = await axios.post('/api/pokemon', pokemonData)
+  return res
 }
 
 // Custom hook. A way to rerun something each `delay` ms.
