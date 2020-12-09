@@ -36,6 +36,13 @@ router.get('/test-thing', async (req, res) => {
     let pagesCount = Math.ceil(count / limit)
     res.json({items:$query.get(), pagesCount})
   })
+  router.put('/pokemon', async (req, res) => {
+    const { model } = req
+    const $pokemon = model.at(`pokemons.${req.body.id}`)
+    await $pokemon.fetch()
+    await $pokemon.set(req.body)
+    res.json({messag:'successfully updated'})
+  })
 // Add new REST API routes here
 
 export default router

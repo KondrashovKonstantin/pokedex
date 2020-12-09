@@ -8,5 +8,10 @@ export default (components = {}) => [
     path: '/add',
     exact: true,
     component: components.Add
+  },
+  {
+    path: '/pokemon/:id',
+    exact: true,
+    component: components.Pokemon
   }
 ]

@@ -18,10 +18,12 @@ export default observer(function Pokemons () {
   const [pagesCount, setPagesCount] = useState(0)
   const [loading, setLoading] = useState(false)
 
-  useEffect(async ()=>{
-      await axios.get(`api/pokemon?page=${page+1}&limit=${limit}`).then(res=>{
+  useEffect(() => {
+      setLoading(true)
+      axios.get(`api/pokemon?page=${page+1}&limit=${limit}`).then(res=>{
           setPokemons(res.data.items)
           setPagesCount(res.data.pagesCount)
+          setLoading(false)
       })
   },[])
 
@@ -39,20 +41,20 @@ export default observer(function Pokemons () {
         setLoading(false)
     })
   }
-  const onSetPage = async (value) => {
+  const onSetPage = (value) => {
     setPage(value)
     setLoading(true)
-    await axios.get(`api/pokemon?page=${value+1}&limit=${limit}`).then(res=>{
+    axios.get(`api/pokemon?page=${value+1}&limit=${limit}`).then(res=>{
         setPokemons(res.data.items)
         setPagesCount(res.data.pagesCount)
         setLoading(false)
     })
 }
 
-const onSetLimit = async (value) => {
+const onSetLimit = (value) => {
     setLimit(value)
     setLoading(true)
-    await axios.get(`api/pokemon?page=${page+1}&limit=${value}`).then(res=>{
+    axios.get(`api/pokemon?page=${page+1}&limit=${value}`).then(res=>{
         setPokemons(res.data.items)
         setPagesCount(res.data.pagesCount)
         setLoading(false)

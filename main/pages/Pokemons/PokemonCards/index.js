@@ -19,7 +19,8 @@ export default observer(function Pokemons ({pokemons, setPokemons, page, setPage
                 number=pokemon.number
                 tags=pokemon.types
                 prop={height:pokemon.height, weight:pokemon.weight, category:pokemon.category, ability:pokemon.ability}
-                key=pokemon.number
+                id=pokemon.id
+
             )
     if pagesCount > 1
         Row(align='center' style={marginTop:16})

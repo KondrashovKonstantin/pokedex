@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
-import { observer } from 'startupjs'
+import { observer, emit } from 'startupjs'
 import { Image } from 'react-native'
 import './index.styl'
 import { Content, Card, Span, Div, Row } from '@startupjs/ui'
 import Tag from '../Tag'
 
-export default observer(function PokemonCard ({image, name, number, tags, prop}) {
+export default observer(function PokemonCard ({image, name, number, tags, prop, id}) {
 
     const [height, setHegiht] = useState()
 
   return pug`
-    Card.root
+    Card.root(onPress = ()=> emit('url', '/pokemon/'+id))
         Div
             Image.img(source={uri:image})
         Row.line(align='between' vAlign='center')
