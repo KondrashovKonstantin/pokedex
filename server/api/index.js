@@ -10,10 +10,15 @@ router.get('/test-thing', async (req, res) => {
     await $testThing.subscribe()
     res.json({ name: 'Test API', testThing: $testThing.get() })
   })
+
   router.post('/pokemon', async (req, res) => {
     const { model } = req
     const $pokemon = model.at('pokemon.')
-    await $pokemon.addNew(req.body)
+    const $countq = model.query('pokemons', {})
+    await $countq.fetch()
+    let number = $countq.get().length + 1
+    let newPokemon = Object.assign(req.body, {number})
+    await $pokemon.addNew(newPokemon)
     res.json({ message:'succesfully added' })
   })
   router.get('/pokemon', async (req, res) => {
