@@ -1,33 +1,29 @@
 import React, { useState } from 'react'
-import { observer, useValue, emit } from 'startupjs'
 import { ScrollView } from 'react-native'
+import { observer, emit, useModel } from 'startupjs'
 import './index.styl'
-import { Content, TextInput, Multiselect, Span, Div, Br, Button } from '@startupjs/ui'
-import { Tag, TestComponent} from '../../../components'
-import axios from 'axios'
+import { Content, TextInput, Multiselect, Span, Br, Button } from '@startupjs/ui'
+import { Tag } from '../../../components'
 
 const tags = [
-  {label:'bug', value:'bug'}, {label:'dragon', value:'dragon'},
-  {label:'fairy', value:'fairy'}, {label:'fire', value:'fire'},
-  {label:'ghost', value:'ghost'},{label:'ground', value:'ground'},
-  {label:'normal', value:'normal'},{label:'psychik', value:'psychik'},
-  {label:'steel', value:'steel'},{label:'dark', value:'dark'},
-  {label:'electric', value:'electric'},{label:'fighting', value:'fighting'},
-  {label:'flying', value:'flying'},{label:'grass', value:'grass'},
-  {label:'ice', value:'ice'},{label:'poission', value:'poission'},
-  {label:'rock', value:'rock'},{label:'watter', value:'watter'},
+  { label: 'bug', value: 'bug' }, { label: 'dragon', value: 'dragon' },
+  { label: 'fairy', value: 'fairy' }, { label: 'fire', value: 'fire' },
+  { label: 'ghost', value: 'ghost' }, { label: 'ground', value: 'ground' },
+  { label: 'normal', value: 'normal' }, { label: 'psychik', value: 'psychik' },
+  { label: 'steel', value: 'steel' }, { label: 'dark', value: 'dark' },
+  { label: 'electric', value: 'electric' }, { label: 'fighting', value: 'fighting' },
+  { label: 'flying', value: 'flying' }, { label: 'grass', value: 'grass' },
+  { label: 'ice', value: 'ice' }, { label: 'poission', value: 'poission' },
+  { label: 'rock', value: 'rock' }, { label: 'watter', value: 'watter' }
 ]
 
 export default observer(function Add () {
-
-  const tagLabel = ({record}) => {
+  const tagLabel = ({ record }) => {
     return pug`
       Tag(type=record.label input)
     `
   }
-
-  const [, $prop] = useValue()
-  const [, $stat] = useValue()
+  const $pokemon = useModel('pokemon.*')
   const [types, setTypes] = useState([])
   const [weaks, setWeak] = useState([])
   const [name, setName] = useState()
@@ -38,17 +34,17 @@ export default observer(function Add () {
   const [ability, setAbility] = useState()
   const [showError, setError] = useState(false)
 
-  async function postPokemon(){
-    let pokemonData={name, types, weaks, image, height, weight, category, ability }
-    if (name && image && category){
-      await axios.post('/api/pokemon', pokemonData)
+  async function postPokemon () {
+    if (name) {
+      let pokemon = $pokemon.query('pokemons', { $count: true })
+      await pokemon.subscribe()
+      let number = pokemon.getExtra()
+      $pokemon.addSelf({ name, types, weaks, image, height, weight, category, ability, number: number + 1 })
       emit('url', '/')
-    }
-    else {
+    } else {
       setError(true)
     }
   }
-
 
   return pug`
     ScrollView.root
@@ -60,12 +56,11 @@ export default observer(function Add () {
           onChangeText=setName
           inputStyle=showError?{borderColor:'red'}:null)
         Br
-        Span.label(styleName=showError?'error':null) Pokemon Image #{showError?'- this fields is required':null}
         TextInput(
           placeholder='image uri...'
           value=image
           onChangeText=setImage
-          inputStyle=showError?{borderColor:'red'}:null)
+        )
         Br
         Span.label Types
         Multiselect(

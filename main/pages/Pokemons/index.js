@@ -1,87 +1,47 @@
-import React, { useEffect, useState } from 'react'
-import { observer } from 'startupjs'
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect } from 'react'
 import { ScrollView } from 'react-native'
+import { observer, useQuery } from 'startupjs'
 import './index.styl'
-import { Span, Div, Row, Loader } from '@startupjs/ui'
-import {  Tag, Search } from '../../../components'
+import { Search } from '../../../components'
 import PokemonCards from './PokemonCards'
-import axios from 'axios'
-
 
 export default observer(function Pokemons () {
-
   const [search, setSearch] = useState('')
   const [tags, setTags] = useState([])
-  const [pokemons, setPokemons] = useState([])
-  const [page, setPage] = useState(0)
   const [limit, setLimit] = useState(10)
-  const [pagesCount, setPagesCount] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [page, setPage] = useState(0)
+  const [expression, setExpression] = useState({ $skip: page * limit, $limit: limit, name: { $regex: search, $options: '-i' } })
+  const [countExpression, setCountExpression] = useState({ name: { $regex: search, $options: '-i' }, $count: true })
+  const [pokemons, $pokemons] = useQuery('pokemons', expression)
+  const [pokemonsCount, $pokemonsCount] = useQuery('pokemons', countExpression)
 
   useEffect(() => {
-      setLoading(true)
-      axios.get(`api/pokemon?page=${page+1}&limit=${limit}`).then(res=>{
-          setPokemons(res.data.items)
-          setPagesCount(res.data.pagesCount)
-          setLoading(false)
-      })
-  },[])
+    if (tags.length > 0) {
+      setExpression({ $skip: page * limit, $limit: limit, name: { $regex: search, $options: '-i' }, types: { $all: tags } })
+      setCountExpression({ name: { $regex: search, $options: '-i' }, types: { $all: tags }, $count: true })
+    } else {
+      setExpression({ $skip: page * limit, $limit: limit, name: { $regex: search, $options: '-i' } })
+      setCountExpression({ name: { $regex: search, $options: '-i' }, $count: true })
+    }
+  }, [tags, page, limit, search])
 
-  const onSearch = () => {
-      const options = {
-        params:{
-          page:page+1,
-          search, limit, tags
-        }
-      }
-      setLoading(true)
-      axios.get(`api/pokemon?`, options).then(res=>{
-        setPokemons(res.data.items)
-        setPagesCount(res.data.pagesCount)
-        setLoading(false)
-    })
-  }
-  const onSetPage = (value) => {
-    setPage(value)
-    setLoading(true)
-    axios.get(`api/pokemon?page=${value+1}&limit=${limit}`).then(res=>{
-        setPokemons(res.data.items)
-        setPagesCount(res.data.pagesCount)
-        setLoading(false)
-    })
-}
-
-const onSetLimit = (value) => {
-    setLimit(value)
-    setLoading(true)
-    axios.get(`api/pokemon?page=${page+1}&limit=${value}`).then(res=>{
-        setPokemons(res.data.items)
-        setPagesCount(res.data.pagesCount)
-        setLoading(false)
-    })
-}
   return pug`
     ScrollView.root
       Search(
-        search=search
-        setSearch=setSearch
-        selected=tags
-        setSelected=setTags
-        onSearch=onSearch)
-      if loading
-        Div.loader
-          Loader(color='error')
-      else 
-        PokemonCards(
-          pokemons=pokemons
-          setPokemons=setPokemons
-          page=page
-          setPage=setPage
-          limit=limit
-          setLimit=setLimit
-          pagesCount=pagesCount
-          setPagesCount=setPagesCount
-          onSetPage=onSetPage
-          onSetLimit=onSetLimit)
+        search = search
+        setSearch = setSearch
+        selected = tags
+        setSelected = setTags
+        setPage = setPage
+      )
+      PokemonCards(
+        pokemons = pokemons
+        pokemonsCount = pokemonsCount
+        page = page
+        setPage = setPage
+        limit = limit
+        setLimit = setLimit
+      )
   `
 })
