@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { ScrollView } from 'react-native'
-import { observer, emit, useModel } from 'startupjs'
+import { observer, emit, useModel, useValue } from 'startupjs'
 import './index.styl'
 import { Content, TextInput, Multiselect, Span, Br, Button } from '@startupjs/ui'
 import { Tag } from '../../../components'
@@ -24,22 +24,18 @@ export default observer(function Add () {
     `
   }
   const $pokemon = useModel('pokemon.*')
-  const [types, setTypes] = useState([])
-  const [weaks, setWeak] = useState([])
-  const [name, setName] = useState()
-  const [image, setImage] = useState()
-  const [height, setHeight] = useState()
-  const [weight, setWeight] = useState()
-  const [category, setCategory] = useState()
-  const [ability, setAbility] = useState()
+  const [pokemonData, $pokemonData] = useValue({
+    types: [],
+    weaks: []
+  })
   const [showError, setError] = useState(false)
 
   async function postPokemon () {
-    if (name) {
+    if (pokemonData.name) {
       let pokemon = $pokemon.query('pokemons', { $count: true })
       await pokemon.subscribe()
       let number = pokemon.getExtra()
-      $pokemon.addSelf({ name, types, weaks, image, height, weight, category, ability, number: number + 1 })
+      $pokemon.addSelf({ ...pokemonData, number: number + 1 })
       emit('url', '/')
     } else {
       setError(true)
@@ -49,25 +45,25 @@ export default observer(function Add () {
   return pug`
     ScrollView.root
       Content
-        Span.label(styleName=showError?'error':null) Pokemon Name #{showError?'- this fields is required':null}
+        Span.label(styleName=showError?'error':null)= "Pokemon Name" + showError ? "- this fields is required" : null
         TextInput(
           placeholder='enter pokemon name...'
-          value=name
-          onChangeText=setName
+          value=pokemonData.name
+          onChangeText=(value)=>$pokemonData.set('name', value)
           inputStyle=showError?{borderColor:'red'}:null)
         Br
         TextInput(
           placeholder='image uri...'
-          value=image
-          onChangeText=setImage
+          value=pokemonData.image
+          onChangeText=(value)=>$pokemonData.set('image', value)
         )
         Br
         Span.label Types
         Multiselect(
           placeholder="select one or more types..."
           options=tags
-          value=types
-          onChange=setTypes
+          value=pokemonData.types
+          onChange=(value)=>$pokemonData.set('tags', value)
           TagComponent=tagLabel
         )
         Br
@@ -75,37 +71,37 @@ export default observer(function Add () {
         Multiselect(
           placeholder="select one or more types..."
           options=tags
-          value=weaks
-          onChange=setWeak
+          value=pokemonData.weaks
+          onChange=(value)=>$pokemonData.set('weaks', value)
           TagComponent=tagLabel
         )
         Br
         Span.label Weight
         TextInput(
           placeholder='weight'
-          value=weight
-          onChangeText=setWeight
+          value=pokemonData.weight
+          onChange=(value)=>$pokemonData.set('weight', value)
         )
         Br
         Span.label Height
         TextInput(
           placeholder='height'
-          value=height
-          onChangeText=setHeight
+          value=pokemonData.height
+          onChange=(value)=>$pokemonData.set('height', value)
         )
         Br
         Span.label(styleName=showError?'error':null) Category #{showError?'- this fields is required':null}
         TextInput(
           placeholder='category'
-          value=category
-          onChangeText=setCategory
+          value=pokemonData.category
+          onChange=(value)=>$pokemonData.set('category', value)
           inputStyle=showError?{borderColor:'red'}:null)
         Br
         Span.label Ability
         TextInput(
           placeholder='ability'
-          value=ability
-          onChangeText=setAbility
+          value=pokemonData.ability
+          onChange=(value)=>$pokemonData.set('ability', value)
         )
         Br
         Button(color='success' variant='flat' onPress=postPokemon) Save

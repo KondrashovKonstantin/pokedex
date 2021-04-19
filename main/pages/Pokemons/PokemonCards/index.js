@@ -1,13 +1,13 @@
 import React from 'react'
 import { observer } from 'startupjs'
 import './index.styl'
-import { Div, Pagination, Row, Select } from '@startupjs/ui'
+import { Pagination, Row, Select } from '@startupjs/ui'
 import { PokemonCard } from '../../../../components'
 
 export default observer(function Pokemons ({ pokemons, page, pokemonsCount, limit, setPage, setLimit }) {
   return pug`
     Select.drpdwn(value=limit options=[10, 25, 50] onChange=(value)=>setLimit(value))
-    Div.root
+    Row.root
       for pokemon in pokemons
         PokemonCard(
           image=pokemon.image
