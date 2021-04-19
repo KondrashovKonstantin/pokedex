@@ -2,11 +2,16 @@ export default (components = {}) => [
   {
     path: '/',
     exact: true,
-    component: components.PHome
+    component: components.Pokemons
   },
   {
-    path: '/about',
+    path: '/add',
     exact: true,
-    component: components.PAbout
+    component: components.Add
+  },
+  {
+    path: '/pokemon/:id',
+    exact: true,
+    component: components.Pokemon
   }
 ]

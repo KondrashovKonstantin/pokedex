@@ -13,6 +13,7 @@ const MenuItem = observer(({ url, children }) => {
   const [currentUrl] = useLocal('$render.url')
   return pug`
     Menu.Item(
+      activeColor='white'
       active=currentUrl === url
       onPress=() => emit('url', url)
     )= children
@@ -25,8 +26,9 @@ export default observer(function ({ children }) {
   function renderSidebar () {
     return pug`
       Menu.sidebar-menu
-        MenuItem(url='/') App
-        MenuItem(url='/about') About
+        MenuItem(url='/') Pokemons
+        MenuItem(url='/add') Add
+
     `
   }
 
@@ -37,7 +39,7 @@ export default observer(function ({ children }) {
         renderContent=renderSidebar
       )
         Row.menu
-          Button(color='secondaryText' icon=faBars onPress=() => $opened.set(!opened))
+          Button(color='white' icon=faBars onPress=() => $opened.set(!opened))
           H1.logo= APP_NAME
 
         Div.body= children
